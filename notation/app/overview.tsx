@@ -1,121 +1,147 @@
 import * as React from 'react';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { View, StyleSheet, SectionList, TouchableOpacity } from 'react-native';
 import { Card, Text, Avatar, FAB, Snackbar, IconButton } from 'react-native-paper';
-
-const notes = [
-	{ id: '1', title: 'Brot kaufen', subtitle: 'Weissbrot, Vollkorn ...', owner: 'A' },
-	{ id: '2', title: 'Brot kaufen', subtitle: 'Weissbrot, Vollkorn ...', owner: 'A' },
-	{ id: '3', title: 'Brot kaufen', subtitle: 'Weissbrot, Vollkorn ...', owner: 'A' },
-];
-
-const sharedNotes = [
-	{ id: '4', title: 'Brot kaufen', subtitle: 'Weissbrot, Vollkorn ...', owner: 'Y' },
-	{ id: '5', title: 'Brot kaufen', subtitle: 'Weissbrot, Vollkorn ...', owner: 'B' },
-	{ id: '6', title: 'Brot kaufen', subtitle: 'Weissbrot, Vollkorn ...', owner: 'C' },
-];
+import { Note } from '../models/note.ts'
+import * as asyncStorage from '../utils/AsyncStorage.ts';
 
 export default function OverviewScreen() {
-	const [snackbarVisible, setSnackbarVisible] = React.useState(false);
-	const [activeNote, setActiveNote] = React.useState<string | null>(null);
+  const [snackbarVisible, setSnackbarVisible] = React.useState(false);
+  const [activeNote, setActiveNote] = React.useState<string | null>(null);
+  const [notes, setNotes] = React.useState<Note[]>([]);
+  const [sharedNotes, setSharedNotes] = React.useState<Note[]>([]);
 
-	const router = useRouter()
-	const handleCardPress = (id: string) => {
-		setActiveNote(activeNote === id ? null : id);
-	};
+  const router = useRouter();
 
+  // Load notes when screen mounts and whenever it regains focus
+  useFocusEffect(
+    React.useCallback(() => {
+      loadNotes();
+    }, [])
+  );
 
-	const renderNote = ({ item }) => (
-		<TouchableOpacity onPress={() => handleCardPress(item.id)}>
+  const loadNotes = async () => {
+    try {
+      const storedNotes = await asyncStorage.getAllItems();
 
-			<Card style={styles.card}>
-				<Card.Title
-					title={item.title}
-					subtitle={item.subtitle}
-					left={(props) => <Avatar.Text {...props} label={item.owner} />}
-					right={(props) =>
-						activeNote === item.id && (
-							<View style={styles.actions}>
-								<IconButton {...props} icon="share-variant" onPress={() => {}} />
-								<IconButton
-									{...props}
-									icon="delete"
-									onPress={() => setSnackbarVisible(true)}
-								/>
-							</View>
-						)
-					}
-				/>
-			</Card>
-		</TouchableOpacity>
-	);
+      const allNotes: Note[] = Object.keys(storedNotes)
+        .filter((key) => key.startsWith("note-"))
+        .map((key) => {
+          const n = storedNotes[key];
+          return {
+            id: n.id,
+            title: n.title ?? "",
+            info: n.info ?? "",
+            owner: n.owner ?? "?",
+            location: n.location,
+            radius: n.radius,
+            shared: n.shared ?? false,
+          } as Note;
+        });
 
-	return (
-		<View style={styles.container}>
-			<SectionList
-				sections={[
-					{ title: 'My Notes', data: notes },
-					{ title: 'Shared', data: sharedNotes },
-				]}
-				keyExtractor={(item) => item.id}
-				renderItem={renderNote}
-				renderSectionHeader={({ section: { title } }) => (
-					<Text style={styles.sectionTitle}>{title}</Text>
-				)}
-				stickySectionHeadersEnabled={false}
-				ListHeaderComponent={
-					<Text style={styles.headerTitle}>Overview</Text>
-				}
-			/>
+      // Split into my notes vs shared
+      const myNotes = allNotes.filter((n) => !n.shared);
+      const shared = allNotes.filter((n) => n.shared);
 
-			<FAB
-				style={styles.fab}
-				icon="plus"
-				label="Create Note"
-				onPress={() => router.navigate('/noteForm', {mode: "create", navigation: router})}
-			/>
-			<FAB
-				style={styles.fab}
-				icon="plus"
-				label="Create Note"
-				onPress={() => router.navigate('/asyncStorage')}
-			/>
-			<Snackbar
-				visible={snackbarVisible}
-				onDismiss={() => setSnackbarVisible(false)}
-				duration={2000}
-			>
-				Success
-			</Snackbar>
-		</View>
-	);
+      setNotes(myNotes);
+      setSharedNotes(shared);
+    } catch (e) {
+      console.error("Failed to load notes", e);
+    }
+  };
+
+  const handleCardPress = (id: string) => {
+    setActiveNote(activeNote === id ? null : id);
+  };
+
+  const renderNote = ({ item }: { item: Note }) => (
+    <TouchableOpacity onPress={() => handleCardPress(item.id)}>
+      <Card style={styles.card}>
+        <Card.Title
+          title={item.title}
+          subtitle={item.info || ""}
+          left={(props) => <Avatar.Text {...props} label={item.owner || "?"} />}
+          right={(props) =>
+            activeNote === item.id && (
+              <View style={styles.actions}>
+                <IconButton {...props} icon="share-variant" onPress={() => {}} />
+                <IconButton
+                  {...props}
+                  icon="delete"
+                  onPress={() => setSnackbarVisible(true)}
+                />
+              </View>
+            )
+          }
+        />
+      </Card>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <SectionList
+        sections={[
+          { title: 'My Notes', data: notes },
+          { title: 'Shared', data: sharedNotes },
+        ]}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={renderNote}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.sectionTitle}>{title}</Text>
+        )}
+        stickySectionHeadersEnabled={false}
+        ListHeaderComponent={
+          <Text style={styles.headerTitle}>Overview</Text>
+        }
+      />
+
+      <FAB
+        style={styles.fab}
+        icon="plus"
+        label="Create Note"
+        onPress={() =>
+          router.push({ pathname: '/noteForm', params: { mode: "create" } })
+        }
+      />
+
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={2000}
+      >
+        Success
+      </Snackbar>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: '#fff' },
-	headerTitle: {
-		fontSize: 24,
-		fontWeight: 'bold',
-		marginHorizontal: 16,
-		marginTop: 12,
-	},
-	sectionTitle: {
-		marginHorizontal: 16,
-		marginTop: 16,
-		marginBottom: 8,
-		fontWeight: 'bold',
-		fontSize: 16,
-	},
-	card: {
-		marginHorizontal: 12,
-		marginVertical: 4,
-	},
-	fab: {
-		position: 'absolute',
-		right: 16,
-		bottom: 16,
-	},
-	actions: {
-		flexDirection: 'row',
-	},
+  container: { flex: 1, backgroundColor: '#fff' },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginHorizontal: 16,
+    marginTop: 12,
+  },
+  sectionTitle: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  card: {
+    marginHorizontal: 12,
+    marginVertical: 4,
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+  },
+  actions: {
+    flexDirection: 'row',
+  },
 });
+
