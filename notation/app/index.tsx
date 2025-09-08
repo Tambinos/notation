@@ -5,7 +5,7 @@ export default function HomeScreen() {
 	return (
 		<View>
 			<Text>index.tsx</Text>
-			<Button title="Go To SecondPage.tsx" onPress={() => router.navigate('/secondPage')} />
+			<Button title="Go To Overview" onPress={() => router.navigate('/overview')} />
 		</View>
 	);
 }
