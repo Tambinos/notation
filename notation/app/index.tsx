@@ -1,11 +1,10 @@
-import {StyleSheet, Text, View, Button, SafeAreaView, Platform} from 'react-native';
-import {Slot, useRouter} from 'expo-router';
-import OverviewScreen from "./OvervewScreen";
-import Layout from "./_layout";
+import { StyleSheet, Text, View, Button } from 'react-native';
+import { useRouter } from 'expo-router';
 export default function HomeScreen() {
 	const router = useRouter();
 	return (
         <View>
+            <Text>index.tsx</Text>
             <Button title="Go To SecondPage.tsx" onPress={() => router.navigate('/secondPage')} />
         </View>
     );
