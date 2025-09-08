@@ -1,10 +1,37 @@
 import {Slot} from "expo-router";
-import {Image, SafeAreaView, StyleSheet, TouchableOpacity, View} from "react-native";
+import {Image, SafeAreaView, StyleSheet, TouchableOpacity, View, Alert} from "react-native";
 import React from "react";
 import { Appbar, Provider as PaperProvider } from 'react-native-paper';
-
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
+import {setItem} from "../utils/AsyncStorage";
 
 export default function Layout() {
+
+    const handleImport = async () => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: 'application/json',
+                copyToCacheDirectory: true,
+            });
+
+            if (!result.canceled) {
+                const file = result.assets[0];
+
+                if (file.uri) {
+                    const fileContent = await FileSystem.readAsStringAsync(file.uri);
+
+                    const jsonData = JSON.parse(fileContent);
+                        await setItem(Date.now().toString(), jsonData);
+
+                    Alert.alert('Success', 'The JSON file was imported successfully!');
+                }
+            }
+        } catch (error) {
+            Alert.alert('Error', 'An error occurred while trying to import the file.');
+        }
+    };
+
     return (
         <PaperProvider>
             <SafeAreaView style={styles.safeArea}>
@@ -17,9 +44,10 @@ export default function Layout() {
                     </TouchableOpacity>
                     <View style={{flex: 1}}/>
                     <Appbar.Action
-                        icon="download"
+                        icon="upload"
                         color="#5f6368"
                         size={28}
+                        onPress={handleImport}
                     />
                 </Appbar.Header>
                 <Slot/>
@@ -35,9 +63,9 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: '#FFFFFF',
-        justifyContent: 'space-between', // Ensures space between logo and action
+        justifyContent: 'space-between',
         alignItems: 'center',
-        height: 60, // A standard header height
+        height: 60,
     },
     logo: {
         width: 100,
