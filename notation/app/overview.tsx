@@ -13,7 +13,6 @@ export default function OverviewScreen() {
 
   const router = useRouter();
 
-  // Load notes when screen mounts and whenever it regains focus
   useFocusEffect(
     React.useCallback(() => {
       loadNotes();
@@ -39,7 +38,6 @@ export default function OverviewScreen() {
           } as Note;
         });
 
-      // Split into my notes vs shared
       const myNotes = allNotes.filter((n) => !n.shared);
       const shared = allNotes.filter((n) => n.shared);
 

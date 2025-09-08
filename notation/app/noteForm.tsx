@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { Text, TextInput, Button } from "react-native-paper";
 import { setItem, getItem } from "../utils/AsyncStorage";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Note } from "../models/note"; // no `.ts` in import
+import { Note } from "../models/note";
 
 export default function NoteForm() {
   const { mode = "create", noteId } = useLocalSearchParams();
@@ -41,7 +41,7 @@ export default function NoteForm() {
     };
 
     await setItem(`note-${note.id}`, note);
-    router.push("/"); // back to home/list
+    router.push("/"); 
   };
 
   return (
