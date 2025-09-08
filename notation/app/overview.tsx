@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, StyleSheet, SectionList, TouchableOpacity } from 'react-native';
-import { Appbar, Card, Text, Avatar, FAB, Snackbar, IconButton } from 'react-native-paper';
+import { Card, Text, Avatar, FAB, Snackbar, IconButton } from 'react-native-paper';
 
 const notes = [
     { id: '1', title: 'Brot kaufen', subtitle: 'Weissbrot, Vollkorn ...', owner: 'A' },
@@ -48,11 +48,6 @@ export default function OverviewScreen() {
 
     return (
         <View style={styles.container}>
-            <Appbar.Header>
-                <Appbar.Content title="Overview" subtitle="My Notes" />
-                <Appbar.Action icon="download" onPress={() => {}} />
-            </Appbar.Header>
-
             <SectionList
                 sections={[
                     { title: 'My Notes', data: notes },
@@ -63,6 +58,10 @@ export default function OverviewScreen() {
                 renderSectionHeader={({ section: { title } }) => (
                     <Text style={styles.sectionTitle}>{title}</Text>
                 )}
+                stickySectionHeadersEnabled={false}
+                ListHeaderComponent={
+                    <Text style={styles.headerTitle}>Overview</Text>
+                }
             />
 
             <FAB
@@ -85,6 +84,12 @@ export default function OverviewScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#fff' },
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginHorizontal: 16,
+        marginTop: 12,
+    },
     sectionTitle: {
         marginHorizontal: 16,
         marginTop: 16,
