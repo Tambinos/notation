@@ -80,6 +80,7 @@ export default function NoteForm() {
         <TextInput
           label="Radius"
           value={radius}
+	keyboardType="numeric"
           onChangeText={setRadius}
           style={[styles.flex, styles.input]}
         />
