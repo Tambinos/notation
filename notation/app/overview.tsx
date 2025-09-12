@@ -1,9 +1,11 @@
 import * as React from 'react';
-import {useFocusEffect, useRouter} from 'expo-router';
-import {SectionList, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {Avatar, Card, FAB, IconButton, Snackbar, Text} from 'react-native-paper';
-import {Note} from '../models/note.ts'
+import { useRouter, useFocusEffect } from 'expo-router';
+import { View, StyleSheet, SectionList, TouchableOpacity } from 'react-native';
+import { Card, Text, Avatar, FAB, Snackbar, IconButton } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Note } from '../models/note.ts';
 import * as asyncStorage from '../utils/AsyncStorage.ts';
+import { removeItem } from "../utils/AsyncStorage.ts";
 
 export default function OverviewScreen() {
     const [snackbarVisible, setSnackbarVisible] = React.useState(false);
@@ -38,11 +40,8 @@ export default function OverviewScreen() {
                     } as Note;
                 });
 
-            const myNotes = allNotes.filter((n) => !n.shared);
-            const shared = allNotes.filter((n) => n.shared);
-
-            setNotes(myNotes);
-            setSharedNotes(shared);
+            setNotes(allNotes.filter((n) => !n.shared));
+            setSharedNotes(allNotes.filter((n) => n.shared));
         } catch (e) {
             console.error("Failed to load notes", e);
         }
@@ -52,22 +51,34 @@ export default function OverviewScreen() {
         setActiveNote(activeNote === id ? null : id);
     };
 
-    const renderNote = ({item}: { item: Note }) => (
+    const handleDelete = async (item: Note) => {
+        try {
+            await removeItem(`note-${item.id}`);
+            // update state locally
+            setNotes((prev) => prev.filter((n) => n.id !== item.id));
+            setSharedNotes((prev) => prev.filter((n) => n.id !== item.id));
+            setSnackbarVisible(true);
+            if (activeNote === item.id) setActiveNote(null);
+        } catch (error) {
+            console.error("Failed to delete note:", error);
+        }
+    };
+
+    const renderNote = ({ item }: { item: Note }) => (
         <TouchableOpacity onPress={() => handleCardPress(item.id)}>
             <Card style={styles.card}>
                 <Card.Title
                     title={item.title}
                     subtitle={item.info || ""}
-                    left={(props) => <Avatar.Text {...props} label={item.owner || "?"}/>}
+                    left={(props) => <Avatar.Text {...props} label={item.owner || "?"} />}
                     right={(props) =>
                         activeNote === item.id && (
                             <View style={styles.actions}>
-                                <IconButton {...props} icon="share-variant" onPress={() => {
-                                }}/>
+                                <IconButton {...props} icon="share-variant" onPress={() => {}} />
                                 <IconButton
                                     {...props}
                                     icon="delete"
-                                    onPress={() => setSnackbarVisible(true)}
+                                    onPress={() => handleDelete(item)}
                                 />
                             </View>
                         )
@@ -78,15 +89,15 @@ export default function OverviewScreen() {
     );
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
             <SectionList
                 sections={[
-                    {title: 'My Notes', data: notes},
-                    {title: 'Shared', data: sharedNotes},
+                    { title: 'My Notes', data: notes },
+                    { title: 'Shared', data: sharedNotes },
                 ]}
-                keyExtractor={(item) => String(item.id)}
+                keyExtractor={(note) => String(note.id)}
                 renderItem={renderNote}
-                renderSectionHeader={({section: {title}}) => (
+                renderSectionHeader={({ section: { title } }) => (
                     <Text style={styles.sectionTitle}>{title}</Text>
                 )}
                 stickySectionHeadersEnabled={false}
@@ -100,7 +111,7 @@ export default function OverviewScreen() {
                 icon="plus"
                 label="Create Note"
                 onPress={() =>
-                    router.push({pathname: '/noteForm', params: {mode: "create"}})
+                    router.push({ pathname: '/noteForm', params: { mode: "create" } })
                 }
             />
 
@@ -109,14 +120,14 @@ export default function OverviewScreen() {
                 onDismiss={() => setSnackbarVisible(false)}
                 duration={2000}
             >
-                Success
+                Note deleted
             </Snackbar>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {flex: 1, backgroundColor: '#fff'},
+    container: { flex: 1, backgroundColor: '#fff' },
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -143,4 +154,3 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
 });
-
