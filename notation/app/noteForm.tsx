@@ -4,6 +4,7 @@ import { Text, TextInput, Button } from "react-native-paper";
 import { setItem, getItem } from "../utils/AsyncStorage";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Note } from "../models/note";
+import LocationPicker from "./location-picker";
 
 export default function NoteForm() {
   const { mode = "create", noteId } = useLocalSearchParams();
@@ -11,7 +12,7 @@ export default function NoteForm() {
 
   const [title, setTitle] = React.useState("");
   const [info, setInfo] = React.useState("");
-  const [location, setLocation] = React.useState<string | undefined>(undefined);
+  const [location, setLocation] = React.useState<{ latitude: number; longitude: number } | undefined>(undefined);
   const [radius, setRadius] = React.useState<string | undefined>(undefined);
 
   React.useEffect(() => {
@@ -20,7 +21,7 @@ export default function NoteForm() {
     }
   }, [mode, noteId]);
 
-  const loadNote = async () => {
+    const loadNote = async () => {
     const note: Note | null = await getItem(`note-${noteId}`);
     if (note) {
       setTitle(note.title || "");
@@ -69,18 +70,14 @@ export default function NoteForm() {
       </Text>
 
       <View style={styles.row}>
-        <Button
-          mode="outlined"
-          onPress={() => setLocation("Demo Location")}
-          style={styles.flex}
-        >
-          {mode === "create" ? "Add Location" : "Select Location"}
-        </Button>
-
+        <LocationPicker
+            mode={mode}
+            onLocationSelect={(marker) => setLocation(marker)}
+        />
         <TextInput
           label="Radius"
           value={radius}
-	keyboardType="numeric"
+          keyboardType="numeric"
           onChangeText={setRadius}
           style={[styles.flex, styles.input]}
         />

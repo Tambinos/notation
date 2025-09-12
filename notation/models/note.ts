@@ -3,7 +3,7 @@ export type Note = {
 	title: string;
 	info: string;
 	owner: char;
-	location?: string;
+	location?: { latitude: number; longitude: number };
 	radius?: string; 
 	shared?: bool;
 };

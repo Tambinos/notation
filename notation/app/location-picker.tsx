@@ -1,27 +1,30 @@
-import React, { useState, useRef } from "react";
-import { View, Button, Modal, Text, StyleSheet } from "react-native";
-import { WebView } from "react-native-webview";
+import React, {useRef, useState} from "react";
+import {Button, Modal, StyleSheet, Text, View} from "react-native";
+import {WebView} from "react-native-webview";
 
-export default function LocationPicker() {
+export default function LocationPicker({mode, onLocationSelect}: {
+    mode: String;
+    onLocationSelect: (marker: { latitude: number; longitude: number }) => void;
+}) {
     const [modalVisible, setModalVisible] = useState(false);
-    const [marker, setMarker] = useState(null);
+    const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
     const webviewRef = useRef(null);
 
-    const handleConfirm = () => {
-        setModalVisible(false);
-        console.log("Selected marker:", marker);
-    };
-
-    // Receive coordinates from WebView
-    const onMessage = (event) => {
+    const onMessage = (event: any) => {
         try {
             const data = JSON.parse(event.nativeEvent.data);
             if (data.latitude && data.longitude) {
                 setMarker(data);
+                onLocationSelect && onLocationSelect(data);
             }
         } catch (e) {
             console.log("Invalid message from WebView:", event.nativeEvent.data);
         }
+    };
+
+    const handleConfirm = () => {
+        setModalVisible(false);
+        if (marker) onLocationSelect(marker);
     };
 
     const htmlContent = `
@@ -38,7 +41,7 @@ export default function LocationPicker() {
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-      const map = L.map('map').setView([37.78825, -122.4324], 13);
+      const map = L.map('map').setView([46.95, 7.45], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(map);
@@ -62,26 +65,24 @@ export default function LocationPicker() {
   `;
 
     return (
-        <View style={{ flex: 1 }}>
-            <Button title="Open Map" onPress={() => setModalVisible(true)} />
+        <View style={{flex: 1}}>
+            <Button title={mode === "create" ? "Add Location" : "Select Location"} onPress={() => setModalVisible(true)}/>
 
             <Modal visible={modalVisible} animationType="slide">
                 <WebView
                     ref={webviewRef}
                     originWhitelist={["*"]}
-                    source={{ html: htmlContent }}
+                    source={{html: htmlContent}}
                     onMessage={onMessage}
                 />
                 <View style={styles.buttonContainer}>
-                    <Button title="Confirm" onPress={handleConfirm} />
-                    <Button title="Cancel" onPress={() => setModalVisible(false)} />
+                    <Button title="Confirm" onPress={handleConfirm}/>
+                    <Button title="Cancel" onPress={() => setModalVisible(false)}/>
                 </View>
             </Modal>
 
             {marker && (
-                <Text style={styles.coordinates}>
-                    Selected: {marker.latitude.toFixed(5)}, {marker.longitude.toFixed(5)}
-                </Text>
+                <Text/>
             )}
         </View>
     );
