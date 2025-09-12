@@ -4,6 +4,7 @@ import { Text, TextInput, Button } from "react-native-paper";
 import { setItem, getItem } from "../utils/AsyncStorage";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Note } from "../models/note";
+import LocationPicker from "./location-picker";
 
 export default function NoteForm() {
   const { mode = "create", noteId } = useLocalSearchParams();
@@ -69,14 +70,7 @@ export default function NoteForm() {
       </Text>
 
       <View style={styles.row}>
-        <Button
-          mode="outlined"
-          onPress={() => setLocation("Demo Location")}
-          style={styles.flex}
-        >
-          {mode === "create" ? "Add Location" : "Select Location"}
-        </Button>
-
+        <LocationPicker/>
         <TextInput
           label="Radius"
           value={radius}

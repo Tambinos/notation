@@ -9,7 +9,6 @@ export default function LocationPicker() {
 
     const handleConfirm = () => {
         setModalVisible(false);
-        console.log("Selected marker:", marker);
     };
 
     // Receive coordinates from WebView
@@ -38,7 +37,7 @@ export default function LocationPicker() {
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-      const map = L.map('map').setView([37.78825, -122.4324], 13);
+      const map = L.map('map').setView([46.95, 7.45], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(map);
@@ -79,9 +78,7 @@ export default function LocationPicker() {
             </Modal>
 
             {marker && (
-                <Text style={styles.coordinates}>
-                    Selected: {marker.latitude.toFixed(5)}, {marker.longitude.toFixed(5)}
-                </Text>
+                <Text/>
             )}
         </View>
     );
