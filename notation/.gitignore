@@ -35,3 +35,7 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Google Account
+./notation-39046-firebase-adminsdk-fbsvc-cd05bf5092.json
+./google-services.json
