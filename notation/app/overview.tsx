@@ -25,6 +25,7 @@ export default function OverviewScreen() {
 
     async function exportAndShare(data: unknown, filename: string): Promise<void> {
         try {
+            data.shared = true
             const safeFilename = filename.endsWith('.json') ? filename : `${filename}.json`;
 
             const file = new File(Paths.cache, safeFilename);
@@ -41,7 +42,7 @@ export default function OverviewScreen() {
         }
     }
 
-    const loadNotes = async () => {
+     const loadNotes = async () => {
         try {
             const storedNotes = await asyncStorage.getAllItems();
 
