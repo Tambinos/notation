@@ -1,10 +1,10 @@
-import {Slot} from "expo-router";
+import {router, Slot} from "expo-router";
 import {Image, SafeAreaView, StyleSheet, TouchableOpacity, View, Alert} from "react-native";
 import React from "react";
 import { Appbar, Provider as PaperProvider } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
 import {setItem} from "../utils/AsyncStorage";
+import {reload} from "expo-router/build/global-state/routing";
 
 export default function Layout() {
 
@@ -19,13 +19,14 @@ export default function Layout() {
                 const file = result.assets[0];
 
                 if (file.uri) {
-                    const fileContent = await FileSystem.readAsStringAsync(file.uri);
-
+                    const fileContent = await (await fetch(file.uri)).text();
                     const jsonData = JSON.parse(fileContent);
-                        await setItem(Date.now().toString(), jsonData);
-
+                    const newId = Date.now().toString();
+                    jsonData.id = newId;
+                    await setItem(`note-${newId}`, jsonData);
                     Alert.alert('Success', 'The JSON file was imported successfully!');
                 }
+                router.push("/");
             }
         } catch (error) {
             Alert.alert('Error', 'An error occurred while trying to import the file.');

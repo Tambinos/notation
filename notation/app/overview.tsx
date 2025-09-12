@@ -6,6 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Note } from '../models/note.ts';
 import * as asyncStorage from '../utils/AsyncStorage.ts';
 import { removeItem } from "../utils/AsyncStorage.ts";
+import {File, Paths} from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 export default function OverviewScreen() {
     const [snackbarVisible, setSnackbarVisible] = React.useState(false);
@@ -21,7 +23,26 @@ export default function OverviewScreen() {
         }, [])
     );
 
-    const loadNotes = async () => {
+    async function exportAndShare(data: unknown, filename: string): Promise<void> {
+        try {
+            data.shared = true
+            const safeFilename = filename.endsWith('.json') ? filename : `${filename}.json`;
+
+            const file = new File(Paths.cache, safeFilename);
+
+            await file.write(JSON.stringify(data, null, 2));
+
+            if (!(await Sharing.isAvailableAsync())) {
+                throw new Error("Sharing is not available on this device");
+            }
+
+            await Sharing.shareAsync(file.uri);
+        } catch (error) {
+            console.error("Error exporting and sharing file:", error);
+        }
+    }
+
+     const loadNotes = async () => {
         try {
             const storedNotes = await asyncStorage.getAllItems();
 
@@ -74,7 +95,11 @@ export default function OverviewScreen() {
                     right={(props) =>
                         activeNote === item.id && (
                             <View style={styles.actions}>
-                                <IconButton {...props} icon="share-variant" onPress={() => {}} />
+                                <IconButton
+                                    {...props}
+                                    icon="share-variant"
+                                    onPress={() => exportAndShare(item, `${item.title || 'export'}.json`)}
+                                />
                                 <IconButton
                                     {...props}
                                     icon="delete"
