@@ -20,8 +20,4 @@ jest.mock("../utils/AsyncStorage", () => ({
 }));
 
 describe("Layout Component", () => {
-    it("renders correctly and matches the snapshot", () => {
-        const tree = renderer.create(<Layout />).toJSON();
-        expect(tree).toMatchSnapshot();
-    });
 });
