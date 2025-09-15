@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {useFocusEffect, useRouter} from 'expo-router';
+import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import {SectionList, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Avatar, Card, FAB, IconButton, Snackbar, Text} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -9,22 +10,23 @@ import {File, Paths} from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import TileRenderer from "./tile-renderer"
 
-export default function OverviewScreen() {
+export default function OverviewScreen({ initialNotes }: { initialNotes?: Note[] }) {
+    const [notes, setNotes] = React.useState<Note[]>(initialNotes || []);
+    const [sharedNotes, setSharedNotes] = React.useState<Note[]>([]);
+    const [activeNote, setActiveNote] = React.useState<string | null>(null);
     const [snackbarVisible, setSnackbarVisible] = React.useState(false);
     const [snackbarText, setSnackbarText] = React.useState("");
-    const [activeNote, setActiveNote] = React.useState<string | null>(null);
-    const [notes, setNotes] = React.useState<Note[]>([]);
-    const [sharedNotes, setSharedNotes] = React.useState<Note[]>([]);
 
     const router = useRouter();
 
     const showSnackbar = (message: string) => {
         setSnackbarText(message);
         setSnackbarVisible(true);
-    }
+    };
+
     useFocusEffect(
         React.useCallback(() => {
-            loadNotes();
+            if (!initialNotes) loadNotes(); // only load from storage if no initialNotes
         }, [])
     );
 
@@ -114,6 +116,7 @@ export default function OverviewScreen() {
                                 <IconButton
                                     {...props}
                                     icon="delete"
+                                    testID={"btn-delete-" + item.id}
                                     onPress={() => handleDelete(item)}
                                 />
                             </View>
@@ -168,6 +171,7 @@ export default function OverviewScreen() {
 
             <Snackbar
                 visible={snackbarVisible}
+                testID="snackbar"
                 onDismiss={() => setSnackbarVisible(false)}
                 duration={2000}
             >
