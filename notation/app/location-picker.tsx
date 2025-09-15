@@ -1,16 +1,17 @@
 import React, { useRef, useState } from "react";
 import { Button, Modal, StyleSheet, Text, View } from "react-native";
-import { WebView } from "react-native-webview";
+import {WebView, WebViewMessageEvent} from "react-native-webview";
+import {Coordinates} from "../models/coordinates";
 
 export default function LocationPicker({ mode, onLocationSelect }: {
-	mode: String;
-	onLocationSelect: (marker: { latitude: number; longitude: number }) => void;
+	mode: string;
+	onLocationSelect: (marker: Coordinates) => void;
 }) {
 	const [modalVisible, setModalVisible] = useState(false);
-	const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
+	const [marker, setMarker] = useState<Coordinates | null>(null);
 	const webviewRef = useRef(null);
 
-	const onMessage = (event: any) => {
+	const onMessage = (event: WebViewMessageEvent) => {
 		try {
 			const data = JSON.parse(event.nativeEvent.data);
 			if (data.latitude && data.longitude) {
@@ -27,7 +28,7 @@ export default function LocationPicker({ mode, onLocationSelect }: {
 		if (marker) onLocationSelect(marker);
 	};
 
-	const htmlContent = `
+    const htmlContent = `
   <!DOCTYPE html>
   <html>
   <head>
@@ -77,7 +78,6 @@ export default function LocationPicker({ mode, onLocationSelect }: {
 				/>
 				<View style={styles.buttonContainer}>
 					<Button title="Confirm" onPress={handleConfirm} />
-					<Button title="Cancel" onPress={() => setModalVisible(false)} />
 				</View>
 			</Modal>
 
