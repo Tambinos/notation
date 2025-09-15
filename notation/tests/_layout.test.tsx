@@ -13,10 +13,15 @@ jest.mock("expo-document-picker", () => ({
     getDocumentAsync: jest.fn(),
 }));
 
+// Extend the global type to avoid TS errors
+declare global {
+    // eslint-disable-next-line no-var
+    var fetch: jest.Mock;
+    var setItem: jest.Mock;
+}
+
 global.fetch = jest.fn();
-
 jest.spyOn(Alert, "alert");
-
 global.setItem = jest.fn();
 
 describe("handleImport via Layout (integration)", () => {
@@ -27,12 +32,12 @@ describe("handleImport via Layout (integration)", () => {
     it("positive: imports valid JSON and navigates", async () => {
         const fakeJson = { title: "Test Note" };
 
-        DocumentPicker.getDocumentAsync.mockResolvedValueOnce({
+        (DocumentPicker.getDocumentAsync as jest.Mock).mockResolvedValueOnce({
             canceled: false,
             assets: [{ uri: "file://test.json" }],
         });
 
-        fetch.mockResolvedValueOnce({
+        (fetch as jest.Mock).mockResolvedValueOnce({
             text: () => Promise.resolve(JSON.stringify(fakeJson)),
         });
 
@@ -52,7 +57,7 @@ describe("handleImport via Layout (integration)", () => {
     });
 
     it("negative: shows error when picker rejects", async () => {
-        DocumentPicker.getDocumentAsync.mockRejectedValueOnce(
+        (DocumentPicker.getDocumentAsync as jest.Mock).mockRejectedValueOnce(
             new Error("fail")
         );
 
