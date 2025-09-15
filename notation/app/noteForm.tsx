@@ -65,7 +65,7 @@ export default function NoteForm() {
 
     return (
         <View style={{ flex: 1 }}>
-			<Viewstyle={styles.container}>
+			<View style={styles.container}>
             <Text variant="displayMedium">
                 {mode === "create" ? "Create" : "Edit"}
             </Text>
