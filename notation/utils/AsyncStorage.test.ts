@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getItem } from './AsyncStorage';
+import {Coordinates} from "../models/coordinates";
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
     getItem: jest.fn(),
@@ -17,12 +18,13 @@ describe('AsyncStorage helpers', () => {
     describe('getItem', () => {
         it('should get and parse an item from AsyncStorage when it exists', async () => {
             const key = 'note';
+            const coordinates: Coordinates = { latitude: 1, longitude: 2 }
             const value =  {
                 id: 1,
                 title: "Test",
                 info: "Test info",
                 owner: "test",
-                location: { latitude: 1, longitude: 2 },
+                location: coordinates,
                 radius: "10",
                 shared: false
             };
