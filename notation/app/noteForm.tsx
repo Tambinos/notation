@@ -6,6 +6,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Note } from "../models/note";
 import LocationPicker from "./location-picker";
+import {Coordinates} from "../models/coordinates";
 import TileRenderer from "./tile-renderer";
 
 export default function NoteForm() {
@@ -16,7 +17,7 @@ export default function NoteForm() {
 	const [snackbarText, setSnackbarText] = React.useState("");const [title, setTitle] = React.useState("");
     const [info, setInfo] = React.useState("");
     const [location, setLocation] = React.useState<
-        { latitude: number; longitude: number } | undefined
+        Coordinates | undefined
     >(undefined);
     const [radius, setRadius] = React.useState<string | undefined>(undefined);
 

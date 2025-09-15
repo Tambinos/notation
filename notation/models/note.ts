@@ -1,9 +1,11 @@
+import {Coordinates} from "./coordinates";
+
 export type Note = {
 	id: string;
 	title: string;
 	info: string;
-	owner: char;
-	location?: { latitude: number; longitude: number };
+	owner: string;
+	location?: Coordinates;
 	radius?: string; 
-	shared?: bool;
+	shared?: boolean;
 };

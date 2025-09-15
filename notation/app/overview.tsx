@@ -28,7 +28,7 @@ export default function OverviewScreen() {
 		}, [])
 	);
 
-	async function exportAndShare(data: unknown, filename: string): Promise<void> {
+	async function exportAndShare(data: Note, filename: string): Promise<void> {
 		try {
 			data.shared = true
 			const safeFilename = filename.endsWith('.json') ? filename : `${filename}.json`;

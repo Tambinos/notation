@@ -1,13 +1,14 @@
 import React, { useRef, useState } from "react";
 import { Button, Modal, StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
+import {Coordinates} from "../models/coordinates";
 
 export default function LocationPicker({ mode, onLocationSelect }: {
 	mode: String;
-	onLocationSelect: (marker: { latitude: number; longitude: number }) => void;
+	onLocationSelect: (marker: Coordinates) => void;
 }) {
 	const [modalVisible, setModalVisible] = useState(false);
-	const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
+	const [marker, setMarker] = useState<Coordinates | null>(null);
 	const webviewRef = useRef(null);
 
 	const onMessage = (event: any) => {
