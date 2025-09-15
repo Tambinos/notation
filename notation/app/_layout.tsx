@@ -4,33 +4,40 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import { Appbar, Provider as PaperProvider } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function Layout() {
 
-	const handleImport = async () => {
-		try {
-			const result = await DocumentPicker.getDocumentAsync({
-				type: 'application/json',
-				copyToCacheDirectory: true,
-			});
+    const handleImport = async () => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: "application/json",
+                copyToCacheDirectory: true,
+            });
 
-			if (!result.canceled) {
-				const file = result.assets[0];
+            if (!result.canceled && result.assets?.length > 0) {
+                const file = result.assets[0];
 
-				if (file.uri) {
-					const fileContent = await (await fetch(file.uri)).text();
-					const jsonData = JSON.parse(fileContent);
-					const newId = Date.now().toString();
-					jsonData.id = newId;
-					await setItem(`note-${newId}`, jsonData);
-					Alert.alert('Success', 'The JSON file was imported successfully!');
-				}
-				router.push("/");
-			}
-		} catch (error) {
-			Alert.alert('Error', 'An error occurred while trying to import the file.');
-		}
-	};
+                if (file.uri) {
+                    const fileContent = await (await fetch(file.uri)).text();
+                    const jsonData = JSON.parse(fileContent);
+
+                    const newId = Date.now().toString();
+                    jsonData.id = newId;
+
+                    await AsyncStorage.setItem(`note-${newId}`, JSON.stringify(jsonData));
+
+                    Alert.alert("Success", "The JSON file was imported successfully!");
+                }
+
+                router.push("/");
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "An error occurred while trying to import the file.");
+        }
+    };
 
 	return (
 		<PaperProvider>
