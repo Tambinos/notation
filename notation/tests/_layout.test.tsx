@@ -1,8 +1,8 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import {fireEvent, render, waitFor} from "@testing-library/react-native";
 import Layout from "../app/_layout";
 import * as DocumentPicker from "expo-document-picker";
-import { Alert } from "react-native";
+import {Alert} from "react-native";
 
 jest.mock("expo-router", () => ({
     router: { push: jest.fn() },
@@ -13,9 +13,7 @@ jest.mock("expo-document-picker", () => ({
     getDocumentAsync: jest.fn(),
 }));
 
-// Extend the global type to avoid TS errors
 declare global {
-    // eslint-disable-next-line no-var
     var fetch: jest.Mock;
     var setItem: jest.Mock;
 }
