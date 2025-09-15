@@ -1,33 +1,33 @@
-import React, {useRef, useState} from "react";
-import {Button, Modal, StyleSheet, Text, View} from "react-native";
-import {WebView} from "react-native-webview";
+import React, { useRef, useState } from "react";
+import { Button, Modal, StyleSheet, Text, View } from "react-native";
+import { WebView } from "react-native-webview";
 
-export default function LocationPicker({mode, onLocationSelect}: {
-    mode: String;
-    onLocationSelect: (marker: { latitude: number; longitude: number }) => void;
+export default function LocationPicker({ mode, onLocationSelect }: {
+	mode: String;
+	onLocationSelect: (marker: { latitude: number; longitude: number }) => void;
 }) {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
-    const webviewRef = useRef(null);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
+	const webviewRef = useRef(null);
 
-    const onMessage = (event: any) => {
-        try {
-            const data = JSON.parse(event.nativeEvent.data);
-            if (data.latitude && data.longitude) {
-                setMarker(data);
-                onLocationSelect && onLocationSelect(data);
-            }
-        } catch (e) {
-            console.log("Invalid message from WebView:", event.nativeEvent.data);
-        }
-    };
+	const onMessage = (event: any) => {
+		try {
+			const data = JSON.parse(event.nativeEvent.data);
+			if (data.latitude && data.longitude) {
+				setMarker(data);
+				onLocationSelect && onLocationSelect(data);
+			}
+		} catch (e) {
+			console.log("Invalid message from WebView:", event.nativeEvent.data);
+		}
+	};
 
-    const handleConfirm = () => {
-        setModalVisible(false);
-        if (marker) onLocationSelect(marker);
-    };
+	const handleConfirm = () => {
+		setModalVisible(false);
+		if (marker) onLocationSelect(marker);
+	};
 
-    const htmlContent = `
+	const htmlContent = `
   <!DOCTYPE html>
   <html>
   <head>
@@ -64,42 +64,42 @@ export default function LocationPicker({mode, onLocationSelect}: {
   </html>
   `;
 
-    return (
-        <View style={{flex: 1}}>
-            <Button title={mode === "create" ? "Add Location" : "Select Location"} onPress={() => setModalVisible(true)}/>
+	return (
+		<View style={{ flex: 1 }}>
+			<Button title={mode === "create" ? "Add Location" : "Select Location"} onPress={() => setModalVisible(true)} />
 
-            <Modal visible={modalVisible} animationType="slide">
-                <WebView
-                    ref={webviewRef}
-                    originWhitelist={["*"]}
-                    source={{html: htmlContent}}
-                    onMessage={onMessage}
-                />
-                <View style={styles.buttonContainer}>
-                    <Button title="Confirm" onPress={handleConfirm}/>
-                    <Button title="Cancel" onPress={() => setModalVisible(false)}/>
-                </View>
-            </Modal>
+			<Modal visible={modalVisible} animationType="slide">
+				<WebView
+					ref={webviewRef}
+					originWhitelist={["*"]}
+					source={{ html: htmlContent }}
+					onMessage={onMessage}
+				/>
+				<View style={styles.buttonContainer}>
+					<Button title="Confirm" onPress={handleConfirm} />
+					<Button title="Cancel" onPress={() => setModalVisible(false)} />
+				</View>
+			</Modal>
 
-            {marker && (
-                <Text/>
-            )}
-        </View>
-    );
+			{marker && (
+				<Text />
+			)}
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-    buttonContainer: {
-        position: "absolute",
-        bottom: 20,
-        left: 20,
-        right: 20,
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-    coordinates: {
-        textAlign: "center",
-        marginTop: 10,
-        fontSize: 16,
-    },
+	buttonContainer: {
+		position: "absolute",
+		bottom: 20,
+		left: 20,
+		right: 20,
+		flexDirection: "row",
+		justifyContent: "space-between",
+	},
+	coordinates: {
+		textAlign: "center",
+		marginTop: 10,
+		fontSize: 16,
+	},
 });
