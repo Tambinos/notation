@@ -1,5 +1,6 @@
 import { router, Slot } from "expo-router";
-import { Image, SafeAreaView, StyleSheet, TouchableOpacity, View, Alert } from "react-native";
+import { Image, StyleSheet, TouchableOpacity, View, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import { Appbar, Provider as PaperProvider } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
