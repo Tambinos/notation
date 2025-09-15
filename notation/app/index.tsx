@@ -15,8 +15,8 @@ async function startTrackingLocation() {
     locationSubscription = await Location.watchPositionAsync(
         {
             accuracy: 6,
-            timeInterval: 15,
-            distanceInterval: 0,
+            timeInterval: 30,
+            distanceInterval: 10,
         },
         (location) => {
             checkLocationAndNotify(location.coords);
