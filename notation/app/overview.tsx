@@ -7,6 +7,7 @@ import { Note } from '../models/note';
 import { getAllItems, removeItem } from '../utils/AsyncStorage'
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import TileRenderer from "./tile-renderer"
 
 export default function OverviewScreen() {
 	const [snackbarVisible, setSnackbarVisible] = React.useState(false);
@@ -79,10 +80,9 @@ export default function OverviewScreen() {
 	const handleDelete = async (item: Note) => {
 		try {
 			await removeItem(`note-${item.id}`);
-			// update state locally
 			setNotes((prev) => prev.filter((n) => n.id !== item.id));
-			setSharedNotes((prev) => prev.filter((n) => n.id !== item.id));
-			showSnackbar("Success");
+            setSharedNotes((prev) => prev.filter((n) => n.id !== item.id));
+            showSnackbar("Success");
 			if (activeNote === item.id) setActiveNote(null);
 		} catch (error) {
 			showSnackbar("Failed to delete the note.");
@@ -97,25 +97,32 @@ export default function OverviewScreen() {
 					subtitle={item.info || ""}
 					left={(props) => <Avatar.Text {...props} label={item.owner || "?"} />}
 					right={(props) =>
-						activeNote === item.id && (
+						activeNote === item.id ? (
 							<View style={styles.actions}>
 								<IconButton
 									{...props}
 									icon="share-variant"
-									onPress={() => exportAndShare(item, `${item.title || 'export'}.json`)}
-								/>
-								<IconButton
-									{...props}
-									icon="delete"
-									onPress={() => handleDelete(item)}
-								/>
-							</View>
-						)
-					}
-				/>
-			</Card>
-		</TouchableOpacity>
-	);
+									onPress={() => exportAndShare(item, `${item.title || 'export'}.json`)} />
+                                <IconButton
+                                    {...props}
+                                    icon="delete"
+                                    onPress={() => handleDelete(item)}
+                                />
+                            </View>
+                        ) : (
+                            <View pointerEvents="none">
+                                <TileRenderer
+                                    coordinate={item.location}
+                                    showMarker={true}
+                                    size={{ width: 120, height: 70 }}
+                                />
+                            </View>
+                        )
+                    }
+                />
+            </Card>
+        </TouchableOpacity>
+    );
 
 	return (
 		<SafeAreaView style={styles.container} edges={['top', 'bottom']}>
