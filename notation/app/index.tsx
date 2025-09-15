@@ -60,11 +60,11 @@ async function checkLocationAndNotify(coords: Coordinates): Promise<void> {
                 info: n.info ?? "",
                 owner: n.owner ?? "?",
                 location: n.location,
-                radius: n.radius,
+                radius: n.radius ?? 100,
                 shared: n.shared ?? false,
             } as Note;
         });
-    const nearbyNotes = notes.filter(note => getDistance(coords, note.location) < note.radius);
+    const nearbyNotes = notes.filter(note => note.location && getDistance(coords, note.location) < note.radius);
     if (nearbyNotes.length > 0) {
         const text2 = nearbyNotes.map((note) => note.title).join(', ');
         Toast.show({

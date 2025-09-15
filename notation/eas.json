@@ -1,0 +1,10 @@
+{
+  "build": {
+    "prod": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {}
+  }
+}
