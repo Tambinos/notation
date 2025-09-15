@@ -101,7 +101,6 @@ export default function OverviewScreen() {
             <Card style={styles.card}>
                 <Card.Title
                     title={item.title}
-                    subtitle={item.info || ""}
                     left={(props) => <Avatar.Text {...props} label={item.owner || "?"} />}
                     right={(props) =>
                         activeNote === item.id ? (
@@ -134,6 +133,11 @@ export default function OverviewScreen() {
                         )
                     }
                 />
+                {item.info ? (
+                    <Card.Content>
+                        <Text>{item.info}</Text>
+                    </Card.Content>
+                ) : null}
             </Card>
         </TouchableOpacity>
     );
