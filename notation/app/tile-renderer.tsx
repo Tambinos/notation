@@ -1,9 +1,10 @@
 import React, { useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
+import {Coordinates} from "../models/coordinates";
 
 type TileRendererProps = {
-    coordinate: { latitude: number; longitude: number };
+    coordinate: Coordinates;
     showMarker?: boolean;
     size?: { width?: number | string; height?: number };
 };
