@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { useRouter, useFocusEffect } from 'expo-router';
-import { View, StyleSheet, SectionList, TouchableOpacity } from 'react-native';
-import { Card, Text, Avatar, FAB, Snackbar, IconButton } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Note } from '../models/note';
-import { getAllItems, removeItem } from '../utils/AsyncStorage'
-import { File, Paths } from 'expo-file-system';
+import {useFocusEffect, useRouter} from 'expo-router';
+import {SectionList, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Avatar, Card, FAB, IconButton, Snackbar, Text} from 'react-native-paper';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {Note} from '../models/note';
+import {getAllItems, removeItem} from '../utils/AsyncStorage'
+import {File, Paths} from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import TileRenderer from "./tile-renderer"
 
@@ -82,9 +82,7 @@ export default function OverviewScreen() {
             pathname: '/noteForm',
             params: { mode: 'edit', noteId: item.id }
         });
-    };
-
-    const handleDelete = async (item: Note) => {
+    };const handleDelete = async (item: Note) => {
         try {
             await removeItem(`note-${item.id}`);
             setNotes((prev) => prev.filter((n) => n.id !== item.id));
@@ -96,12 +94,12 @@ export default function OverviewScreen() {
         }
     };
 
-    const renderNote = ({ item }: { item: Note }) => (
+    const renderNote = ({item}: { item: Note }) => (
         <TouchableOpacity onPress={() => handleCardPress(item.id)}>
             <Card style={styles.card}>
                 <Card.Title
                     title={item.title}
-                    left={(props) => <Avatar.Text {...props} label={item.owner || "?"} />}
+                    left={(props) => <Avatar.Text {...props} label={item.owner || "?"}/>}
                     right={(props) =>
                         activeNote === item.id ? (
                             <View style={styles.actions}>
@@ -112,8 +110,7 @@ export default function OverviewScreen() {
                                 <IconButton
                                     {...props}
                                     icon="pencil"
-                                    onPress={() => handleEdit(item)}
-                                />
+                                    onPress={() => handleEdit(item)}/>
                                 <IconButton
                                     {...props}
                                     icon="delete"
@@ -126,7 +123,7 @@ export default function OverviewScreen() {
                                     <TileRenderer
                                         coordinate={item.location}
                                         showMarker={true}
-                                        size={{ width: 120, height: 70 }}
+                                        size={{width: 120, height: 70}}
                                     />
                                 </View>
                             )
@@ -146,12 +143,12 @@ export default function OverviewScreen() {
         <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
             <SectionList
                 sections={[
-                    { title: 'My Notes', data: notes },
-                    { title: 'Shared', data: sharedNotes },
+                    {title: 'My Notes', data: notes},
+                    {title: 'Shared', data: sharedNotes},
                 ]}
                 keyExtractor={(note) => String(note.id)}
                 renderItem={renderNote}
-                renderSectionHeader={({ section: { title } }) => (
+                renderSectionHeader={({section: {title}}) => (
                     <Text style={styles.sectionTitle}>{title}</Text>
                 )}
                 stickySectionHeadersEnabled={false}
@@ -165,7 +162,7 @@ export default function OverviewScreen() {
                 icon="plus"
                 label="Create Note"
                 onPress={() =>
-                    router.push({ pathname: '/noteForm', params: { mode: "create" } })
+                    router.push({pathname: '/noteForm', params: {mode: "create"}})
                 }
             />
 
@@ -181,7 +178,7 @@ export default function OverviewScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#fff' },
+    container: {flex: 1, backgroundColor: '#fff'},
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
