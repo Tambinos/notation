@@ -3,8 +3,7 @@ import { Image, SafeAreaView, StyleSheet, TouchableOpacity, View, Alert } from "
 import React from "react";
 import { Appbar, Provider as PaperProvider } from 'react-native-paper';
 import * as DocumentPicker from 'expo-document-picker';
-import { setItem } from "../utils/AsyncStorage";
-import { reload } from "expo-router/build/global-state/routing";
+import {setItem} from "../utils/AsyncStorage";
 
 export default function Layout() {
 
