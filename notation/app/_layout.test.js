@@ -1,8 +1,7 @@
 import React from "react";
 import renderer from "react-test-renderer";
-import Layout from "../app/_layout"; // adjust path if needed
+import Layout from "../app/_layout";
 
-// Mock external dependencies
 jest.mock("expo-router", () => ({
     router: { push: jest.fn() },
     Slot: () => <></>,
